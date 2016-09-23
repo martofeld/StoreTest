@@ -30,4 +30,6 @@ dependencies {
     //Why not use RxJava
     compile 'io.reactivex:rxjava:1.2.0'
     compile 'io.reactivex:rxandroid:1.2.1'
+    //Image loading dependencies
+    compile 'com.facebook.fresco:fresco:0.13.0'
 }
