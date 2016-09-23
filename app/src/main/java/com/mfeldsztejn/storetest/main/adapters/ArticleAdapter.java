@@ -1,8 +1,10 @@
 package com.mfeldsztejn.storetest.main.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.mfeldsztejn.storetest.R;
 import com.mfeldsztejn.storetest.dtos.Article;
 
 import java.util.List;
@@ -15,12 +17,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     private List<Article> articles;
 
     public ArticleAdapter(List<Article> articles) {
-
+        this.articles = articles;
     }
 
     @Override
     public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        return new ArticleViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.article_view, parent, false));
     }
 
     @Override
