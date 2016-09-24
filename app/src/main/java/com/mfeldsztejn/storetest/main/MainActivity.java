@@ -20,10 +20,22 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int PAGE_SIZE = 100;
+    /**
+     * View elements
+     */
     //It should be package protected since it will be used from an inner class
+    LinearLayoutManager layoutManager;
+    /**
+     * Api elements
+     */
+    //It should be package protected since it will be used from an inner class
+    boolean isLoading;
+    int page;
     private RecyclerView articleRecyclerView;
     private ArticleAdapter articleAdapter;
     private Subscription subscription;
+    private ArticleApiInterface articleApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +43,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        articleApi = ApiManager.getInstance().create(ArticleApiInterface.class);
+        page = 1;
+        getArticles();
+    }
 
-        ArticleApiInterface articleApi = ApiManager.getInstance().create(ArticleApiInterface.class);
-        subscription = articleApi.getAllArticles()
+    void getArticles() {
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
+
+        isLoading = true;
+        subscription = articleApi.getAllArticles(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Article>>() {
@@ -46,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     public void call(Throwable throwable) {
                         //If an error should happen log it
                         throwable.printStackTrace();
+                        isLoading = false;
                     }
                 });
     }
@@ -60,14 +82,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         articleRecyclerView = (RecyclerView) findViewById(R.id.article_recycler_view);
-        articleRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new LinearLayoutManager(this);
+        articleRecyclerView.setLayoutManager(layoutManager);
+        articleRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                if (!isLoading) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount >= PAGE_SIZE) {
+                        page++;
+                        getArticles();
+                    }
+                }
+            }
+        });
     }
 
     //Should be package private since its used from inside an inner class
     void onArticlesLoaded(List<Article> articles) {
+        isLoading = false;
         if (articleAdapter == null) {
             articleAdapter = new ArticleAdapter(articles);
+            articleRecyclerView.setAdapter(articleAdapter);
+        } else {
+            articleAdapter.addAll(articles);
+            articleAdapter.notifyDataSetChanged();
         }
-        articleRecyclerView.setAdapter(articleAdapter);
     }
 }

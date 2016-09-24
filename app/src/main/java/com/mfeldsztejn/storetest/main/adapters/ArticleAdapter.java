@@ -34,4 +34,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     public int getItemCount() {
         return articles.size();
     }
+
+    public void addAll(List<Article> articles) {
+        this.articles.addAll(articles);
+    }
 }
