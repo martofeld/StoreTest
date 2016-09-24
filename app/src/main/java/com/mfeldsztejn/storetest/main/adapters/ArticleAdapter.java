@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.mfeldsztejn.storetest.R;
 import com.mfeldsztejn.storetest.dtos.Article;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,5 +38,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     public void addAll(List<Article> articles) {
         this.articles.addAll(articles);
+    }
+
+    public void sort() {
+        Collections.sort(articles);
+        notifyDataSetChanged();
+    }
+
+    public void shuffle() {
+        Collections.shuffle(articles);
+        notifyDataSetChanged();
     }
 }

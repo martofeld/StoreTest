@@ -1,12 +1,14 @@
 package com.mfeldsztejn.storetest.dtos;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by mfeldsztejn on 9/22/16.
  */
 
-public class Article {
+public class Article implements Comparable<Article> {
     @SerializedName("name")
     private String name;
     @SerializedName("url")
@@ -30,5 +32,10 @@ public class Article {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public int compareTo(@NonNull Article article) {
+        return name.compareTo(article.getName());
     }
 }
