@@ -5,9 +5,8 @@ import android.app.Application;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 /**
- * Created by mfeldsztejn on 9/23/16.
+ * The main application implementation for one time operations
  */
-
 public class MainApplication extends Application {
 
     @Override

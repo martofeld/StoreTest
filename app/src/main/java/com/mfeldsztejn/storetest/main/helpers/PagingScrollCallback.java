@@ -1,9 +1,11 @@
 package com.mfeldsztejn.storetest.main.helpers;
 
 /**
- * Created by mfeldsztejn on 9/24/16.
+ * A callback to inform the implementer of a paging scroll
  */
-
 public interface PagingScrollCallback {
+    /**
+     * The recycler view scrolled enough to request a paging
+     */
     void onScrolled();
 }

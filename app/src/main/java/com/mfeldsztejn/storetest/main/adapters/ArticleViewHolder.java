@@ -11,21 +11,41 @@ import com.mfeldsztejn.storetest.dtos.Article;
 import com.mfeldsztejn.storetest.repositories.ApiManager;
 
 /**
- * Created by mfeldsztejn on 9/22/16.
+ * A view holder for the article
  */
-
 public class ArticleViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * The text view for the article name
+     */
     private final TextView nameTextView;
+    /**
+     * The image view for the article image
+     */
     private final SimpleDraweeView imageView;
 
+    /**
+     * A constructor for the view holder
+     *
+     * @param itemView the view holder view
+     */
     public ArticleViewHolder(View itemView) {
         super(itemView);
         nameTextView = (TextView) itemView.findViewById(R.id.article_name);
         imageView = (SimpleDraweeView) itemView.findViewById(R.id.article_image);
     }
 
+    /**
+     * Binds an article to the view holder
+     * @param article   the article to bind
+     */
     public void bind(Article article) {
         nameTextView.setText(article.getName());
-        imageView.setImageURI(Uri.parse(ApiManager.BASE_URL + article.getImageUrl()));
+        String url;
+        if (article.isImageUrlAbsolute()) {
+            url = article.getImageUrl();
+        } else {
+            url = ApiManager.BASE_URL + article.getImageUrl();
+        }
+        imageView.setImageURI(Uri.parse(url));
     }
 }

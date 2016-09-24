@@ -9,10 +9,16 @@ import retrofit2.http.Path;
 import rx.Observable;
 
 /**
- * Created by mfeldsztejn on 9/22/16.
+ * The interface for the article api that will be used by retrofit
  */
+public interface ArticleApi {
 
-public interface ArticleApiInterface {
+    /**
+     * Get all the articles from the service
+     *
+     * @param page the page we are in
+     * @return an observable that can be subscribed to
+     */
     @GET("articles/{page}/")
     Observable<List<Article>> getAllArticles(@Path("page") int page);
 }

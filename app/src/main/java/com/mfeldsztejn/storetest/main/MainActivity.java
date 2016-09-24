@@ -15,7 +15,7 @@ import com.mfeldsztejn.storetest.main.adapters.ArticleAdapter;
 import com.mfeldsztejn.storetest.main.helpers.PagingScrollCallback;
 import com.mfeldsztejn.storetest.main.helpers.PagingScrollListener;
 import com.mfeldsztejn.storetest.repositories.ApiManager;
-import com.mfeldsztejn.storetest.repositories.ArticleApiInterface;
+import com.mfeldsztejn.storetest.repositories.ArticleApi;
 
 import java.util.List;
 
@@ -24,6 +24,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+/**
+ * The main activity implementation
+ */
 public class MainActivity extends AppCompatActivity implements PagingScrollCallback, SearchView.OnQueryTextListener {
 
     /**
@@ -31,15 +34,15 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
      */
     //It should be package protected since it will be used from an inner class
     boolean isLoading;
+    private Subscription subscription;
+    private ArticleApi articleApi;
+
     /**
      * View elements
      */
-    //It should be package protected since it will be used from an inner class
     private RecyclerView articleRecyclerView;
     private int page;
     private ArticleAdapter articleAdapter;
-    private Subscription subscription;
-    private ArticleApiInterface articleApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
         setContentView(R.layout.activity_main);
 
         initView();
-        articleApi = ApiManager.getInstance().create(ArticleApiInterface.class);
+        articleApi = ApiManager.getInstance().create(ArticleApi.class);
         page = 1;
         getArticles();
     }
@@ -65,20 +68,6 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
         searchItem.setIcon(R.drawable.ic_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
-//        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-//            @Override
-//            public boolean onMenuItemActionExpand(MenuItem item) {
-//                Toast.makeText(MainActivity.this, "search was expanded", Toast.LENGTH_SHORT).show();
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                articleAdapter.reset();
-//                Toast.makeText(MainActivity.this, "search was collapsed", Toast.LENGTH_SHORT).show();
-//                return true;
-//            }
-//        });
         return true;
     }
 
@@ -104,15 +93,22 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    /**
+     * If we have an subscription clear it to avoid memory leaks
+     */
+    void unsubscribe() {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
     }
 
+    /**
+     * Get the articles from the rest api
+     */
     void getArticles() {
-        if (subscription != null && !subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-        }
+        unsubscribe();
 
         isLoading = true;
         subscription = articleApi.getAllArticles(page)
@@ -128,17 +124,26 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
                     public void call(Throwable throwable) {
                         //If an error should happen log it
                         throwable.printStackTrace();
+                        unsubscribe();
                         isLoading = false;
                     }
                 });
     }
 
+    /**
+     * Init the view elements
+     */
     private void initView() {
         articleRecyclerView = (RecyclerView) findViewById(R.id.article_recycler_view);
         articleRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         articleRecyclerView.addOnScrollListener(new PagingScrollListener(this));
     }
 
+    /**
+     * Articles where obtained from the network
+     *
+     * @param articles The new articles
+     */
     //Should be package private since its used from inside an inner class
     void onArticlesLoaded(List<Article> articles) {
         isLoading = false;
@@ -151,6 +156,9 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
         }
     }
 
+    /**
+     * On scrolled implementation meaning the recycler view scrolled enough
+     */
     @Override
     public void onScrolled() {
         if (!isLoading) {
@@ -159,15 +167,27 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
         }
     }
 
+    /**
+     * The on query text submit implementation for the search view
+     *
+     * @param query the query submitted
+     * @return false since we don't handle the event
+     */
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
 
+    /**
+     * The on query text change implementation for the search view
+     *
+     * @param query the query
+     * @return true since we handle the event
+     */
     @Override
     public boolean onQueryTextChange(String query) {
         articleAdapter.filter(query);
         articleRecyclerView.smoothScrollToPosition(0);
-        return false;
+        return true;
     }
 }
