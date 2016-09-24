@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import com.mfeldsztejn.storetest.R;
 import com.mfeldsztejn.storetest.dtos.Article;
 import com.mfeldsztejn.storetest.main.adapters.ArticleAdapter;
+import com.mfeldsztejn.storetest.main.helpers.PagingScrollCallback;
+import com.mfeldsztejn.storetest.main.helpers.PagingScrollListener;
 import com.mfeldsztejn.storetest.repositories.ApiManager;
 import com.mfeldsztejn.storetest.repositories.ArticleApiInterface;
 
@@ -20,29 +22,22 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PagingScrollCallback {
 
-    private static final int PAGE_SIZE = 100;
-    /**
-     * View elements
-     */
-    //It should be package protected since it will be used from an inner class
-    LinearLayoutManager layoutManager;
     /**
      * Api elements
      */
     //It should be package protected since it will be used from an inner class
     boolean isLoading;
-    int page;
+    /**
+     * View elements
+     */
+    //It should be package protected since it will be used from an inner class
     private RecyclerView articleRecyclerView;
+    private int page;
     private ArticleAdapter articleAdapter;
     private Subscription subscription;
     private ArticleApiInterface articleApi;
-
-    /**
-     * Other elements
-     */
-    private boolean isSorted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +57,6 @@ public class MainActivity extends AppCompatActivity {
         MenuItem sortItem = menu.findItem(R.id.menu_sort);
         shuffleItem.setIcon(R.drawable.ic_shuffle);
         sortItem.setIcon(R.drawable.ic_sort);
-        if (isSorted) {
-            shuffleItem.setVisible(true);
-            sortItem.setVisible(false);
-        } else {
-            sortItem.setVisible(true);
-            shuffleItem.setVisible(false);
-        }
         return true;
     }
 
@@ -76,13 +64,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sort:
-                isSorted = true;
                 articleAdapter.sort();
                 invalidateOptionsMenu();
                 return true;
 
             case R.id.menu_shuffle:
-                isSorted = false;
                 articleAdapter.shuffle();
                 invalidateOptionsMenu();
                 return true;
@@ -125,25 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         articleRecyclerView = (RecyclerView) findViewById(R.id.article_recycler_view);
-        layoutManager = new LinearLayoutManager(this);
-        articleRecyclerView.setLayoutManager(layoutManager);
-        articleRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                if (!isLoading) {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                            && firstVisibleItemPosition >= 0
-                            && totalItemCount >= PAGE_SIZE) {
-                        page++;
-                        getArticles();
-                    }
-                }
-            }
-        });
+        articleRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        articleRecyclerView.addOnScrollListener(new PagingScrollListener(this));
     }
 
     //Should be package private since its used from inside an inner class
@@ -155,6 +124,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             articleAdapter.addAll(articles);
             articleAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onScrolled() {
+        if (!isLoading) {
+            page++;
+            getArticles();
         }
     }
 }

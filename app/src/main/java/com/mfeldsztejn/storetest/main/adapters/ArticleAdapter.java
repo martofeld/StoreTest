@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import com.mfeldsztejn.storetest.R;
 import com.mfeldsztejn.storetest.dtos.Article;
+import com.mfeldsztejn.storetest.main.helpers.AlphabeticalComparator;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,9 +17,11 @@ import java.util.List;
 
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     private List<Article> articles;
+    private AlphabeticalComparator comparator;
 
     public ArticleAdapter(List<Article> articles) {
         this.articles = articles;
+        this.comparator = new AlphabeticalComparator(true);
     }
 
     @Override
@@ -41,7 +44,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     }
 
     public void sort() {
-        Collections.sort(articles);
+        comparator.toggle();
+        Collections.sort(articles, comparator);
         notifyDataSetChanged();
     }
 
