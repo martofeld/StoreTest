@@ -1,9 +1,11 @@
 package com.mfeldsztejn.storetest.main;
 
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,7 +24,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements PagingScrollCallback {
+public class MainActivity extends AppCompatActivity implements PagingScrollCallback, SearchView.OnQueryTextListener {
 
     /**
      * Api elements
@@ -54,9 +56,29 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         MenuItem shuffleItem = menu.findItem(R.id.menu_shuffle);
-        MenuItem sortItem = menu.findItem(R.id.menu_sort);
         shuffleItem.setIcon(R.drawable.ic_shuffle);
+
+        MenuItem sortItem = menu.findItem(R.id.menu_sort);
         sortItem.setIcon(R.drawable.ic_sort);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchItem.setIcon(R.drawable.ic_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
+//        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+//            @Override
+//            public boolean onMenuItemActionExpand(MenuItem item) {
+//                Toast.makeText(MainActivity.this, "search was expanded", Toast.LENGTH_SHORT).show();
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                articleAdapter.reset();
+//                Toast.makeText(MainActivity.this, "search was collapsed", Toast.LENGTH_SHORT).show();
+//                return true;
+//            }
+//        });
         return true;
     }
 
@@ -65,11 +87,13 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
         switch (item.getItemId()) {
             case R.id.menu_sort:
                 articleAdapter.sort();
+                articleRecyclerView.smoothScrollToPosition(0);
                 invalidateOptionsMenu();
                 return true;
 
             case R.id.menu_shuffle:
                 articleAdapter.shuffle();
+                articleRecyclerView.smoothScrollToPosition(0);
                 invalidateOptionsMenu();
                 return true;
             default:
@@ -133,5 +157,17 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
             page++;
             getArticles();
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        articleAdapter.filter(query);
+        articleRecyclerView.smoothScrollToPosition(0);
+        return false;
     }
 }
