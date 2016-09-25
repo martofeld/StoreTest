@@ -43,7 +43,7 @@ staticCodeAnalysis {
 
     ignoreErrors = false
 
-    findbugsExclude = "${project.rootDir}/.findbugs-filter.xml"
-    checkstyleRules = "${project.rootDir}/.checkstyle.xml"
-    pmdRules = ["${project.rootDir}/.pmd.xml"]
+    findbugsExclude = "${project.rootDir}/config/android/.findbugs-filter.xml"
+    checkstyleRules = "${project.rootDir}/config/android/.checkstyle.xml"
+    pmdRules = ["${project.rootDir}/config/android/.pmd.xml"]
 }
