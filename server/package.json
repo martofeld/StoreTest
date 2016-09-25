@@ -1,0 +1,10 @@
+{
+  "name": "store_test_api",
+  "version": "1.0.0",
+  "description": "The api for the store test application",
+  "main": "app.js",
+  "author": "Martin Feldsztejn",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
