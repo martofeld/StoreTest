@@ -25,16 +25,20 @@ public class AlphabeticalComparator implements Comparator<Article> {
 
     /**
      * The compare implementation
-     * @param a1    the first article
-     * @param a2    the second article
+     *
+     * @param a1 the first article
+     * @param a2 the second article
      * @return the return value of the article comparisons
      */
     @Override
     public int compare(Article a1, Article a2) {
-        if (ascending)
-            return a1.compareTo(a2);
-        else
-            return a2.compareTo(a1);
+        int value;
+        if (ascending) {
+            value = a1.compareTo(a2);
+        } else {
+            value = a2.compareTo(a1);
+        }
+        return value;
     }
 
     /**

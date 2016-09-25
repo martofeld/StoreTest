@@ -29,19 +29,34 @@ import rx.schedulers.Schedulers;
  */
 public class MainActivity extends AppCompatActivity implements PagingScrollCallback, SearchView.OnQueryTextListener {
 
+    // API ELEMENTS
     /**
-     * Api elements
+     * Flag to know if we have any current request
+     * This attribute is package to avoid an extra synthetic method
      */
-    //It should be package protected since it will be used from an inner class
-    boolean isLoading;
+    @SuppressWarnings("PMD.DefaultPackage")
+    /*package*/ boolean isLoading;
+    /**
+     * The page we are currently on (used to keep track of the paging)
+     */
+    private int page;
+    /**
+     * The subscription returned after subscribing to the request
+     */
     private Subscription subscription;
+    /**
+     * The article api
+     */
     private ArticleApi articleApi;
 
+    // VIEW ELEMENTS
     /**
-     * View elements
+     * The recycler view for the articles
      */
     private RecyclerView articleRecyclerView;
-    private int page;
+    /**
+     * The adapter for the recycler view
+     */
     private ArticleAdapter articleAdapter;
 
     @Override
@@ -73,32 +88,40 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean taken;
         switch (item.getItemId()) {
             case R.id.menu_sort:
                 articleAdapter.sort();
                 articleRecyclerView.smoothScrollToPosition(0);
                 invalidateOptionsMenu();
-                return true;
+                taken = true;
+                break;
 
             case R.id.menu_shuffle:
                 articleAdapter.shuffle();
                 articleRecyclerView.smoothScrollToPosition(0);
                 invalidateOptionsMenu();
-                return true;
+                taken = true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                taken = super.onOptionsItemSelected(item);
+                break;
         }
+        return taken;
     }
 
     @Override
     protected void onStop() {
+        unsubscribe();
         super.onStop();
     }
 
     /**
      * If we have an subscription clear it to avoid memory leaks
+     * The method is package to avoid an extra synthetic method
      */
-    void unsubscribe() {
+    @SuppressWarnings("PMD.DefaultPackage")
+    /*package*/ void unsubscribe() {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
@@ -107,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
     /**
      * Get the articles from the rest api
      */
-    void getArticles() {
+    private void getArticles() {
         unsubscribe();
 
         isLoading = true;
@@ -140,11 +163,12 @@ public class MainActivity extends AppCompatActivity implements PagingScrollCallb
     }
 
     /**
-     * Articles where obtained from the network
+     * Articles where obtained from the network.
+     * The method is package to avoid an extra synthetic method
      *
      * @param articles The new articles
      */
-    //Should be package private since its used from inside an inner class
+    @SuppressWarnings("PMD.DefaultPackage")
     void onArticlesLoaded(List<Article> articles) {
         isLoading = false;
         if (articleAdapter == null) {

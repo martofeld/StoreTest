@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A manager for the api to ensure it is never null
  */
-public class ApiManager {
+public final class ApiManager {
 
     /**
      * The base url for the server

@@ -11,23 +11,24 @@ import com.mfeldsztejn.storetest.main.helpers.AlphabeticalComparator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This adapter is used to load the data to the recycler view
  */
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     /**
-     * The articles
-     */
-    private List<Article> articles;
-    /**
      * The original articles before filtering
      */
-    private List<Article> originalArticles;
+    private final List<Article> originalArticles;
     /**
      * A comparator to sort alphabetically
      */
-    private AlphabeticalComparator comparator;
+    private final AlphabeticalComparator comparator;
+    /**
+     * The articles
+     */
+    private List<Article> articles;
 
     /**
      * Constructor taking a list of the articles
@@ -35,6 +36,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
      * @param articles The original articles
      */
     public ArticleAdapter(List<Article> articles) {
+        super();
         this.articles = articles;
         this.originalArticles = new ArrayList<>(articles);
         this.comparator = new AlphabeticalComparator(true);
@@ -42,8 +44,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * On create view holder implementation
-     * @param parent    the parent
-     * @param viewType  the view type
+     *
+     * @param parent   the parent
+     * @param viewType the view type
      * @return A view holder for the article
      */
     @Override
@@ -53,8 +56,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * On bind view holder implementation
-     * @param holder    the holder to bind
-     * @param position  the position of the holder
+     *
+     * @param holder   the holder to bind
+     * @param position the position of the holder
      */
     @Override
     public void onBindViewHolder(ArticleViewHolder holder, int position) {
@@ -63,6 +67,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * Get item count implementation
+     *
      * @return The size of the items
      */
     @Override
@@ -72,7 +77,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * Add articles to the current list (used for paging)
-     * @param articles  The articles to add
+     *
+     * @param articles The articles to add
      */
     public void addAll(List<Article> articles) {
         this.articles.addAll(articles);
@@ -98,15 +104,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * Filter the list based on a query
+     *
      * @param query the query from which to filter
      */
     public void filter(String query) {
-        final String lowerCaseQuery = query.toLowerCase();
+        final String lowerCaseQuery = query.toLowerCase(Locale.getDefault());
         List<Article> filterFrom = query.length() <= 1 ? originalArticles : articles;
 
         final List<Article> filteredArticles = new ArrayList<>();
         for (Article model : filterFrom) {
-            final String text = model.getName().toLowerCase();
+            final String text = model.getName().toLowerCase(Locale.getDefault());
             if (text.contains(lowerCaseQuery)) {
                 filteredArticles.add(model);
             }

@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Representation of the article
  */
@@ -18,13 +20,6 @@ public class Article implements Comparable<Article> {
      */
     @SerializedName("url")
     private String imageUrl;
-
-    /**
-     * A default empty constructor
-     */
-    public Article() {
-
-    }
 
     /**
      * Get the name of the article
@@ -77,8 +72,28 @@ public class Article implements Comparable<Article> {
      * @param article an article to compare to
      * @return the compare value of the names
      */
+    @SuppressFBWarnings("EQ_COMPARETO_USE_OBJECT_EQUALS")
     @Override
     public int compareTo(@NonNull Article article) {
         return name.compareTo(article.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean equals;
+        if (obj instanceof Article) {
+            Article article = (Article) obj;
+            equals = article == this || article.getName().equals(this.name) && article.getImageUrl().equals(this.imageUrl);
+        } else {
+            equals = false;
+        }
+
+        return equals;
+
     }
 }

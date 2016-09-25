@@ -24,6 +24,7 @@ public class PagingScrollListener extends RecyclerView.OnScrollListener {
      * @param callback the callback for when scrolled enough
      */
     public PagingScrollListener(PagingScrollCallback callback) {
+        super();
         this.callback = callback;
     }
 
