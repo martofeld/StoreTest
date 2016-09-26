@@ -5,7 +5,7 @@ Library usage explanations:
 5) Be able to consume information from a Webservice:
     By using the retrofit library the app was automatically network aware.
 
-6) Be able to support a very extensive catalog (both from the visual side and from the architectural part)_
+6) Be able to support a very extensive catalog (both from the visual side and from the architectural part):
     - Visual side:
         - The support library contains a view called RecyclerView which uses the ViewHolder pattern. This allows it to have an almost infinite amount items since it recycles and reutilizes the views when they leave the screen.
     - Architectural part:
